@@ -1,32 +1,35 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Literal
+
+# Allowed subjects catalog
+CompulsorySubjects = Literal["Maths", "English", "Urdu", "Islamiat"]
+JuniorSubjects = Literal["Science", "Social Studies"]
+SeniorSubjects = Literal["Biology", "Physics", "Chemistry", "Pak Studies", "Computer Science"]
 
 class Question(BaseModel):
-    id: int
-    question: str = Field(description="Question text in Urdish")
-    options: List[str] = Field(description="4 multiple-choice options")
-    correct_answer: str = Field(description="The exact correct option string")
-    concept_tag: str = Field(description="Sub-concept tested")
+    id: int = Field(description="Unique ID for question (1 to 6)")
+    difficulty: Literal["easy", "medium", "hard"] = Field(description="Question difficulty level: easy, medium, or hard")
+    question: str = Field(description="The question text in Urdish")
+    options: List[str] = Field(description="Exactly 4 choices")
+    correct_answer: str = Field(description="Exact string matching one option")
+    concept_tag: str = Field(description="Short concept tested")
 
 class QuizSchema(BaseModel):
-    topic: str
-    grade: str
-    questions: List[Question]
+    subject: str = Field(description="Subject name")
+    topic: str = Field(description="Topic name")
+    grade: str = Field(description="Class grade (Class 1 to 10)")
+    questions: List[Question] = Field(description="List of 6 questions: 2 easy, 2 medium, 2 hard")
 
 class EvaluationResult(BaseModel):
     question_id: int
     is_correct: bool
     user_answer: str
     correct_answer: str
-    remediation_analogy: str = Field(
-        description="Simplest Urdish analogy for the missed concept, or empty if correct."
-    )
+    remediation_analogy: str = ""
 
 class OverallEvaluation(BaseModel):
     score: int
     total: int
     passed: bool
     evaluations: List[EvaluationResult]
-    perceived_understanding_level: str = Field(
-        description="Estimated understanding level (Beginner/Intermediate/Advanced)"
-    )
+    perceived_understanding_level: str
