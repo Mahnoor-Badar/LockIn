@@ -33,7 +33,7 @@ class QuizEngine:
     def __init__(self):
         api_key = get_gemini_api_key()
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-2.5-flash"
+        self.model = "gemini-3.8-flash"
 
     def get_allowed_subjects(self, grade_num: int) -> List[str]:
         """
