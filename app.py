@@ -717,6 +717,12 @@ if "session_id" in st.session_state:
                     )
                 )
 
+                remediation_messages = [
+                    item.remediation_analogy
+                    for item in evaluation.evaluations
+                    if item.remediation_analogy
+                ]
+
                 attempts = st.session_state[
                     "quiz_attempts"
                 ]
@@ -817,6 +823,10 @@ if "session_id" in st.session_state:
                 ] = stage_result
 
                 st.session_state[
+                    "stage_remediation"
+                ] = remediation_messages
+
+                st.session_state[
                     "current_quiz"
                 ] = None
 
@@ -858,6 +868,17 @@ if "session_id" in st.session_state:
                 "Abhi is level par thori aur "
                 "practice chahiye."
             )
+
+            remediation_messages = st.session_state.get(
+                "stage_remediation",
+                [],
+            )
+
+            if remediation_messages:
+                st.subheader("💡 Let's Review")
+
+                for message in remediation_messages:
+                    st.info(message)
 
             st.write(
                 f"Hum **{stage.title()}** level "
@@ -1022,6 +1043,7 @@ if "session_id" in st.session_state:
             "quiz_version",
             "current_quiz",
             "last_stage_result",
+            "stage_remediation",
         ]:
 
             st.session_state.pop(

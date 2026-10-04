@@ -4,3 +4,4 @@ pydantic
 python-dotenv
 gTTS
 streamlit-mic-recorder
+firebase-admin
