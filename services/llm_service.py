@@ -19,7 +19,7 @@ class LLMService:
     def __init__(self):
         api_key = get_gemini_api_key()
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-2.5-flash"
+        self.model = "gemini-3.8-flash"
 
     def _get_safety_settings(self) -> list[types.SafetySetting]:
         """
@@ -28,32 +28,66 @@ class LLMService:
         return [
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
         ]
 
-    def explain_topic(self, topic: str, grade: str, board: str = "General") -> str:
+    def explain_topic(
+        self,
+        topic: str,
+        grade: str,
+        board: str = "General",
+        subject: str = "General",
+        student_question: str = "",
+    ) -> str:
         """
-        Generates an Urdish explanation for a given topic with safety guardrails.
+        Generates an age-appropriate Urdish explanation
+        based on the selected subject/topic and the student's question.
         """
+
+        if student_question.strip():
+            question_text = student_question.strip()
+        else:
+            question_text = (
+                f"Please explain the topic '{topic}' "
+                "in a simple way."
+            )
+
         prompt = f"""
-        Explain the topic '{topic}' for Grade '{grade}' ({board} Board).
-        - Speak naturally in Urdish (Roman Urdu + English technical terms).
-        - Use simple, everyday Pakistani analogies.
-        - Keep it concise and end by asking if they understood ("Smjh aa gya?").
+        Student profile:
+        - Grade: {grade}
+        - Board: {board}
+        - Subject: {subject}
+        - Topic: {topic}
+
+        Student question:
+        {question_text}
+
+        Answer the student's question directly.
+
+        Rules:
+        - Stay strictly within the selected educational subject and topic.
+        - Speak naturally in Urdish
+          (Roman Urdu + English technical terms).
+        - Match the explanation to the student's grade.
+        - Use simple everyday Pakistani examples when helpful.
+        - Do not unnecessarily repeat the whole topic.
+        - Keep the answer clear and concise.
+        - End with "Samajh aa gaya?" only when it feels natural.
         """
+
         try:
             response = self.client.models.generate_content(
                 model=self.model,
@@ -64,9 +98,14 @@ class LLMService:
                     temperature=0.3,
                 )
             )
+
             return response.text
-        except Exception as e:
-            return "Yeh topic safe parhai ke dairey mein nahi aata ya API response error aya hai. Please apna topic check karein!"
+
+        except Exception:
+            return (
+                "Mujhe is waqt jawab generate karne mein "
+                "problem aa rahi hai. Please apna sawal dobara try karein."
+            )
 
     def generate_quiz(self, topic: str, grade: str) -> QuizSchema:
         """
