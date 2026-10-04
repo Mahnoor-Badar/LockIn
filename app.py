@@ -28,6 +28,262 @@ st.set_page_config(
     layout="centered",
 )
 
+
+st.markdown(
+    """
+    <style>
+    /* LOCKIN UI THEME */
+
+    /* =====================================================
+       LOCKIN GLOBAL UI THEME
+       Background: white
+       Fields: #97C1E6
+       Buttons: #9DFFFF
+       Text: medium grey
+       ===================================================== */
+
+    html, body, [data-testid="stAppViewContainer"] {
+        background-color: #FFFFFF !important;
+        color: #666666 !important;
+    }
+
+    [data-testid="stHeader"] {
+        background-color: #FFFFFF !important;
+    }
+
+    /* Main text */
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stCaptionContainer"],
+    label,
+    .stText,
+    .stWrite {
+        color: #666666 !important;
+        font-size: 1.08rem !important;
+    }
+
+    /* Headings */
+    h1 {
+        color: #666666 !important;
+        font-size: 2.25rem !important;
+    }
+
+    h2 {
+        color: #666666 !important;
+        font-size: 1.85rem !important;
+    }
+
+    h3 {
+        color: #666666 !important;
+        font-size: 1.55rem !important;
+    }
+
+    h4, h5, h6 {
+        color: #666666 !important;
+    }
+
+    /* Text fields */
+    [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div {
+        background-color: #97C1E6 !important;
+        border: 1px solid #82AED3 !important;
+        border-radius: 8px !important;
+    }
+
+    input,
+    textarea {
+        background-color: transparent !important;
+        color: #666666 !important;
+        font-size: 1.08rem !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: #666666 !important;
+        opacity: 0.75 !important;
+    }
+
+    /* Select boxes */
+    [data-baseweb="select"] > div {
+        background-color: #97C1E6 !important;
+        border: 1px solid #82AED3 !important;
+        border-radius: 8px !important;
+    }
+
+    [data-baseweb="select"] * {
+        color: #666666 !important;
+        font-size: 1.05rem !important;
+    }
+
+    /* Field labels */
+    [data-testid="stTextInput"] label,
+    [data-testid="stTextArea"] label,
+    [data-testid="stSelectbox"] label {
+        color: #666666 !important;
+        font-size: 1.08rem !important;
+    }
+
+    /* All buttons */
+    .stButton > button {
+        background-color: #9DFFFF !important;
+        color: #666666 !important;
+        border: 1px solid #7DDDDD !important;
+        border-radius: 10px !important;
+        font-size: 1.08rem !important;
+        font-weight: 600 !important;
+        padding: 0.65rem 1rem !important;
+    }
+
+    .stButton > button:hover,
+    .stButton > button:focus,
+    .stButton > button:active {
+        background-color: #9DFFFF !important;
+        color: #666666 !important;
+    }
+
+    /* Radio options */
+    [data-testid="stRadio"] label {
+        color: #666666 !important;
+        font-size: 1.05rem !important;
+    }
+
+    /* Metrics */
+    [data-testid="stMetricLabel"],
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricDelta"] {
+        color: #666666 !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-size: 2rem !important;
+    }
+
+    /* Alerts / info / success / warning text */
+    [data-testid="stAlert"] * {
+        color: #666666 !important;
+        font-size: 1.05rem !important;
+    }
+
+    /* Links */
+    a {
+        color: #666666 !important;
+    }
+
+
+
+    /* LOCKIN TEXT FIELD FOCUS FIX */
+
+    /* Text fields — normal state */
+    [data-baseweb="input"],
+    [data-baseweb="input"] > div {
+        background-color: #97C1E6 !important;
+    }
+
+    /* Text fields — when clicked / focused */
+    [data-baseweb="input"]:focus-within,
+    [data-baseweb="input"]:focus-within > div {
+        background-color: #97C1E6 !important;
+    }
+
+    /* Actual input element */
+    [data-baseweb="input"] input,
+    [data-baseweb="input"] input:focus {
+        background-color: #97C1E6 !important;
+        color: #666666 !important;
+    }
+
+
+    /* LOCKIN TEXT INPUT FINAL FIX */
+
+    /* =====================================================
+       TEXT INPUTS ONLY
+       Class / Board / Subject / Topic
+       ===================================================== */
+
+    [data-testid="stTextInput"] [data-baseweb="input"],
+    [data-testid="stTextInput"] [data-baseweb="input"] > div,
+    [data-testid="stTextInput"] input {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+        color: #666666 !important;
+    }
+
+    /* Keep the same color while the field is focused */
+    [data-testid="stTextInput"] [data-baseweb="input"]:focus-within,
+    [data-testid="stTextInput"] [data-baseweb="input"]:focus-within > div,
+    [data-testid="stTextInput"] input:focus {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+    }
+
+    /* Override Streamlit/BaseWeb internal background layers */
+    [data-testid="stTextInput"] [data-baseweb="input"] > div > div,
+    [data-testid="stTextInput"] [data-baseweb="input"] > div > div > input {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+    }
+
+
+    /* LOCKIN CLASS SELECTBOX FINAL FIX */
+
+    /* Class selectbox only */
+    [data-testid="stSelectbox"] [data-baseweb="select"],
+    [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    [data-testid="stSelectbox"] [role="combobox"] {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+        color: #666666 !important;
+    }
+
+    /* Keep Class color when clicked/focused */
+    [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within,
+    [data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
+    [data-testid="stSelectbox"] [role="combobox"]:focus {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+        color: #666666 !important;
+    }
+
+
+    /* LOCKIN TEXT INPUT FILLED STATE FIX */
+
+    /* Keep text fields #97C1E6 after text is entered */
+    [data-testid="stTextInput"] input,
+    [data-testid="stTextInput"] input:not(:placeholder-shown),
+    [data-testid="stTextInput"] input:focus,
+    [data-testid="stTextInput"] input:valid {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+        color: #666666 !important;
+        box-shadow: 0 0 0 1000px #97C1E6 inset !important;
+        -webkit-box-shadow: 0 0 0 1000px #97C1E6 inset !important;
+    }
+
+    /* Browser autofill / saved-value state */
+    [data-testid="stTextInput"] input:-webkit-autofill,
+    [data-testid="stTextInput"] input:-webkit-autofill:hover,
+    [data-testid="stTextInput"] input:-webkit-autofill:focus,
+    [data-testid="stTextInput"] input:-webkit-autofill:active {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+        -webkit-text-fill-color: #666666 !important;
+        -webkit-box-shadow: 0 0 0 1000px #97C1E6 inset !important;
+        box-shadow: 0 0 0 1000px #97C1E6 inset !important;
+    }
+
+    /* Keep all internal input layers the same color */
+    [data-testid="stTextInput"] [data-baseweb="input"],
+    [data-testid="stTextInput"] [data-baseweb="input"] > div,
+    [data-testid="stTextInput"] [data-baseweb="input"] > div > div {
+        background: #97C1E6 !important;
+        background-color: #97C1E6 !important;
+    }
+
+</style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Temporary local quiz mode for testing while Gemini quota is exhausted.
 
 
