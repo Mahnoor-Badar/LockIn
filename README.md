@@ -1,4 +1,4 @@
-# LockIn Repository // this line must be removed afer writing this document.
+
 🔒 LockIn
 Adaptive AI-Powered Urdu–English Learning Assistant
  *"Teach in the language and at the level the learner understands."*
@@ -183,7 +183,8 @@ Gamification and learning streaks
 Mobile-first experience
 
 👥 Team
+Mahnoor Badar(Lead) -AI/ LLM Integration, Setup, App Deployment and Presentation video
 Javaria Murtaza- Frontend and Backend
 Umaima Rashid- PRD, Slides and Documentation support
 Muhammad Junaid Murtaza- Pricing, Business model and Tester
-Mahnoor(Lead) -AI/ LLM Integration, Setup, App Deployment and Presentation video
+
