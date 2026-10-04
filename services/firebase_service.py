@@ -9,6 +9,20 @@ def initialize_firebase():
     if firebase_admin._apps:
         return firestore.client()
 
+    try:
+        import streamlit as st
+
+        if "firebase" in st.secrets:
+            firebase_config = dict(st.secrets["firebase"])
+
+            cred = credentials.Certificate(firebase_config)
+            firebase_admin.initialize_app(cred)
+
+            return firestore.client()
+
+    except ImportError:
+        pass
+
     firebase_files = glob.glob("*.json")
 
     if not firebase_files:
@@ -90,6 +104,7 @@ def create_learning_gap(gap):
         .document(gap.gap_id)
         .set(data)
     )
+
 
 def save_learning_report(session_id, report):
     (
