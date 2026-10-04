@@ -14,12 +14,18 @@ def get_gemini_api_key() -> str:
     if api_key:
         return api_key
 
-    # Second: Streamlit Secrets
+    # Second: Streamlit Secrets (top level, or inside any section)
     try:
-        api_key = st.secrets["GEMINI_API_KEY"]
+        if "GEMINI_API_KEY" in st.secrets:
+            return st.secrets["GEMINI_API_KEY"]
 
-        if api_key:
-            return api_key
+        for name in st.secrets:
+            section = st.secrets[name]
+            try:
+                if "GEMINI_API_KEY" in section:
+                    return section["GEMINI_API_KEY"]
+            except TypeError:
+                pass
 
     except Exception:
         pass
