@@ -30,7 +30,15 @@ st.set_page_config(
 )
 
 apply_lockin_theme()
+apply_lockin_theme()
 
+# TEMPORARY DEBUG - remove after fixing
+try:
+    st.write("Secret names visible to app:", list(st.secrets.keys()))
+except Exception as e:
+    st.write("Secrets error:", type(e).__name__)
+
+llm_service = LLMService()
 
 llm_service = LLMService()
 voice_service = VoiceService()
