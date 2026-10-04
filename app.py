@@ -28,6 +28,8 @@ st.set_page_config(
     layout="centered",
 )
 
+# Temporary local quiz mode for testing while Gemini quota is exhausted.
+
 
 llm_service = LLMService()
 voice_service = VoiceService()
@@ -38,14 +40,88 @@ report_service = ReportService()
 
 def generate_stage_quiz(stage):
     try:
-        with st.spinner(
-            f"LockIn {stage.title()} level ke 2 questions bana raha hai... 🤖"
-        ):
-            quiz = quiz_engine.generate_quiz(
+        # Local test mode avoids Gemini quota usage.
+        if st.session_state.get("quiz_test_mode", False):
+            from schemas.quiz_schema import QuizSchema, Question
+
+            stage_questions = {
+                "easy": [
+                    Question(
+                        id=1,
+                        difficulty="easy",
+                        question="1/2 mein numerator kya hai?",
+                        options=["1", "2", "3", "4"],
+                        correct_answer="1",
+                        concept_tag="numerator",
+                    ),
+                    Question(
+                        id=2,
+                        difficulty="easy",
+                        question="1/2 + 1/2 kitna hota hai?",
+                        options=["1", "2", "1/4", "3/2"],
+                        correct_answer="1",
+                        concept_tag="fraction addition",
+                    ),
+                ],
+                "medium": [
+                    Question(
+                        id=1,
+                        difficulty="medium",
+                        question="2/4 kis fraction ke barabar hai?",
+                        options=["1/2", "1/4", "2/3", "3/4"],
+                        correct_answer="1/2",
+                        concept_tag="equivalent fractions",
+                    ),
+                    Question(
+                        id=2,
+                        difficulty="medium",
+                        question="3/4 aur 1/4 ko add karein.",
+                        options=["1", "2", "3/8", "4/8"],
+                        correct_answer="1",
+                        concept_tag="fraction addition",
+                    ),
+                ],
+                "hard": [
+                    Question(
+                        id=1,
+                        difficulty="hard",
+                        question="2/3 aur 3/4 mein kaunsa bara hai?",
+                        options=["2/3", "3/4", "Dono equal", "1/2"],
+                        correct_answer="3/4",
+                        concept_tag="fraction comparison",
+                    ),
+                    Question(
+                        id=2,
+                        difficulty="hard",
+                        question="1 1/2 ko improper fraction mein convert karein.",
+                        options=["2/2", "3/2", "4/2", "5/2"],
+                        correct_answer="3/2",
+                        concept_tag="mixed fractions",
+                    ),
+                ],
+            }
+
+            quiz = QuizSchema(
+                subject=st.session_state["subject"],
                 topic=st.session_state["topic"],
                 grade=st.session_state["student_class"],
-                subject=st.session_state["subject"],
-                difficulty=stage,
+                questions=stage_questions[stage],
+            )
+
+        else:
+            with st.spinner(
+                f"LockIn {stage.title()} level ke 2 questions bana raha hai... 🤖"
+            ):
+                quiz = quiz_engine.generate_quiz(
+                    subject=st.session_state["subject"],
+                    topic=st.session_state["topic"],
+                    grade=st.session_state["student_class"],
+                    difficulty=stage,
+                )
+
+        if len(quiz.questions) != 2:
+            raise ValueError(
+                f"Expected exactly 2 questions, got {len(quiz.questions)}."
             )
 
         st.session_state["current_quiz"] = quiz
@@ -53,8 +129,12 @@ def generate_stage_quiz(stage):
         st.session_state["quiz_version"] = str(uuid.uuid4())
         st.session_state["last_stage_result"] = None
 
+        return True
+
     except Exception as e:
         st.error(f"Quiz generate nahi ho saka: {e}")
+        st.exception(e)
+        return False
 
 
 # =========================================================
@@ -301,9 +381,8 @@ if "session_id" in st.session_state:
                 "current_quiz"
             ] = None
 
-            generate_stage_quiz("easy")
-
-            st.rerun()
+            if generate_stage_quiz("easy"):
+                st.rerun()
 
     # -----------------------------------------------------
     # CURRENT QUIZ
@@ -534,11 +613,8 @@ if "session_id" in st.session_state:
                 use_container_width=True,
             ):
 
-                generate_stage_quiz(
-                    stage
-                )
-
-                st.rerun()
+                if generate_stage_quiz(stage):
+                    st.rerun()
 
         elif next_stage in {
             "medium",
@@ -562,11 +638,8 @@ if "session_id" in st.session_state:
                 use_container_width=True,
             ):
 
-                generate_stage_quiz(
-                    next_stage
-                )
-
-                st.rerun()
+                if generate_stage_quiz(next_stage):
+                    st.rerun()
 
         elif next_stage == "complete":
 

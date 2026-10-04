@@ -55,54 +55,74 @@ class QuizEngine:
         return [
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
             types.SafetySetting(
                 category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-                threshold=types.HarmBlockThreshold.BLOCK_LOW_MEDIUM_OR_HIGH,
+                threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
             ),
         ]
 
-    def generate_quiz(self, subject: str, topic: str, grade: str) -> QuizSchema:
+    def generate_quiz(
+        self,
+        subject: str,
+        topic: str,
+        grade: str,
+        difficulty: str,
+    ) -> QuizSchema:
         """
-        Generates a 6-question tiered multiple-choice quiz (2 Easy, 2 Medium, 2 Hard)
-        for the specified subject, topic, and grade using Gemini JSON Schema mode.
+        Generate exactly 2 MCQs for one adaptive difficulty stage.
         """
-        try:
-            grade_num = int(''.join(filter(str.isdigit, grade)))
-        except ValueError:
-            grade_num = 5
 
-        allowed_subjects = self.get_allowed_subjects(grade_num)
-        if subject.strip().title() not in [s.title() for s in allowed_subjects]:
+        allowed_difficulties = {
+            "easy",
+            "medium",
+            "hard",
+        }
+
+        if difficulty not in allowed_difficulties:
             raise ValueError(
-                f"Subject '{subject}' is not available for {grade}. "
-                f"Available subjects for {grade}: {', '.join(allowed_subjects)}"
+                f"Invalid difficulty '{difficulty}'. "
+                "Expected easy, medium, or hard."
             )
 
         prompt = f"""
-        Create a 6-question multiple-choice quiz in Urdish (Roman Urdu + English terms) 
-        testing core concepts for Subject: '{subject}', Topic: '{topic}', Grade: '{grade}'.
+Create EXACTLY 2 multiple-choice questions in Urdish
+(Roman Urdu + English technical terms).
 
-        STRICT DIFFICULTY BREAKDOWN:
-        - Questions 1 & 2: 'easy' difficulty (Basic recall and definitions)
-        - Questions 3 & 4: 'medium' difficulty (Application of concept)
-        - Questions 5 & 6: 'hard' difficulty (Reasoning/conceptual mastery)
+Student information:
+- Grade: {grade}
+- Subject: {subject}
+- Topic: {topic}
+- Difficulty: {difficulty}
 
-        Requirements:
-        - Exactly 6 questions total.
-        - 4 options per question.
-        - Exactly 1 correct option string matching one of the options.
-        - A concise concept_tag identifying what is tested.
-        """
+Difficulty rules:
+- easy = basic understanding and recall
+- medium = application, comparison, or simple reasoning
+- hard = deeper reasoning or challenging application
+
+Requirements:
+- Exactly 2 questions.
+- Exactly 4 options per question.
+- Exactly 1 correct answer per question.
+- correct_answer must exactly match one option.
+- Give each question a concise concept_tag.
+- Each question's difficulty must be exactly "{difficulty}".
+- Questions must be appropriate for the selected grade.
+- Questions must stay within the selected subject and topic.
+- The returned quiz subject field must be exactly "{subject}".
+- The returned quiz topic field must be exactly "{topic}".
+- The returned quiz grade field must be exactly "{grade}".
+- Return only the structured quiz data.
+"""
 
         try:
             response = self.client.models.generate_content(
@@ -113,12 +133,33 @@ class QuizEngine:
                     safety_settings=self._get_safety_settings(),
                     response_mime_type="application/json",
                     response_schema=QuizSchema,
-                    temperature=0.2
-                )
+                    temperature=0.2,
+                ),
             )
-            return QuizSchema.model_validate_json(response.text)
+
+            quiz = QuizSchema.model_validate_json(
+                response.text
+            )
+
+            if len(quiz.questions) != 2:
+                raise ValueError(
+                    f"Expected exactly 2 questions, got "
+                    f"{len(quiz.questions)}."
+                )
+
+            for question in quiz.questions:
+                if question.difficulty != difficulty:
+                    raise ValueError(
+                        "Gemini returned a question with "
+                        "the wrong difficulty."
+                    )
+
+            return quiz
+
         except Exception as e:
-            raise ValueError(f"Quiz generation failed due to safety filters or parsing error: {e}")
+            raise ValueError(
+                f"Quiz generation failed: {e}"
+            ) from e
 
     def evaluate_quiz(self, quiz: QuizSchema, user_answers: Dict[int, str]) -> OverallEvaluation:
         """
