@@ -1060,20 +1060,40 @@ if "session_id" in st.session_state:
 # START SCREEN
 # =========================================================
 
-st.title("🔒 LockIn")
-
-st.subheader(
-    "Your adaptive AI learning tutor"
+st.markdown(
+    """
+    <div class="lockin-wordmark">LOCKIN</div>
+    """,
+    unsafe_allow_html=True,
 )
 
-st.write(
-    "Learn a topic with an AI tutor "
-    "and then test your understanding "
-    "through an adaptive quiz."
+st.markdown(
+    "<div class='lockin-hero-title'>Let's set up your learning session.</div>",
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<div class="lockin-description-15">'
+    "Give LockIn a little context so it can teach, practise, "
+    "and assess the topic at the right level for you."
+    "</div>",
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    "### 01 · Your level"
+)
+
+st.markdown(
+    '<div class="lockin-step-description-15">'
+    "Select your current class so the explanations and questions "
+    "match your level."
+    "</div>",
+    unsafe_allow_html=True,
 )
 
 student_class = st.selectbox(
-    "Select your class",
+    "Class",
     [
         "Class 1",
         "Class 2",
@@ -1088,25 +1108,56 @@ student_class = st.selectbox(
     ],
 )
 
-board = st.text_input(
-    "Education Board",
-    placeholder="e.g. Federal Board",
+st.markdown("### 02 · Your learning context")
+
+st.markdown(
+    '<div class="lockin-step-description-15">'
+    "This helps LockIn use the right curriculum context for your lesson."
+    "</div>",
+    unsafe_allow_html=True,
 )
 
-subject = st.text_input(
-    "Subject",
-    placeholder=(
-        "e.g. Mathematics, Science, English"
-    ),
+col1, col2 = st.columns(2)
+
+with col1:
+    board = st.text_input(
+        "Education Board",
+        placeholder="e.g. Federal Board",
+    )
+
+with col2:
+    subject = st.text_input(
+        "Subject",
+        placeholder="e.g. Mathematics",
+    )
+
+st.markdown("### 03 · What do you want to learn?")
+
+st.markdown(
+    '<div class="lockin-step-description-15">'
+    "Enter one focused topic. You can start simple; "
+    "LockIn will adapt the practice later."
+    "</div>",
+    unsafe_allow_html=True,
 )
 
 topic = st.text_input(
-    "What do you want to learn?",
+    "Topic",
     placeholder="e.g. Fractions",
 )
 
+st.markdown(
+    """
+    <div class="lockin-learning-note">
+        Your session will follow:
+        <strong>Learn → Practise → Assess</strong>.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 if st.button(
-    "Start Learning",
+    "Start Learning  →",
     use_container_width=True,
 ):
 
