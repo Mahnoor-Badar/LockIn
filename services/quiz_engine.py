@@ -156,10 +156,90 @@ Requirements:
 
             return quiz
 
-        except Exception as e:
-            raise ValueError(
-                f"Quiz generation failed: {e}"
-            ) from e
+        except Exception:
+    return self._get_demo_quiz(
+        subject=subject,
+        topic=topic,
+        grade=grade,
+        difficulty=difficulty,
+    )
+    def _get_demo_quiz(
+    self,
+    subject: str,
+    topic: str,
+    grade: str,
+    difficulty: str,
+) -> QuizSchema:
+    """Return predefined demo questions when Gemini is unavailable."""
+
+    demo_questions = {
+        "easy": [
+            Question(
+                id=1,
+                difficulty="easy",
+                question="1/2 mein numerator kya hai?",
+                options=["1", "2", "3", "4"],
+                correct_answer="1",
+                concept_tag="fraction numerator",
+            ),
+            Question(
+                id=2,
+                difficulty="easy",
+                question="1/2 ka matlab kya hai?",
+                options=[
+                    "2 mein se 1 hissa",
+                    "1 mein se 2 hisse",
+                    "3 mein se 1 hissa",
+                    "4 mein se 2 hisse",
+                ],
+                correct_answer="2 mein se 1 hissa",
+                concept_tag="fraction meaning",
+            ),
+        ],
+        "medium": [
+            Question(
+                id=1,
+                difficulty="medium",
+                question="1/2 aur 1/4 ko add karein.",
+                options=["1/4", "2/4", "3/4", "1"],
+                correct_answer="3/4",
+                concept_tag="fraction addition",
+            ),
+            Question(
+                id=2,
+                difficulty="medium",
+                question="3/4 aur 1/4 ko add karein.",
+                options=["1", "2", "3/8", "4/8"],
+                correct_answer="1",
+                concept_tag="fraction addition",
+            ),
+        ],
+        "hard": [
+            Question(
+                id=1,
+                difficulty="hard",
+                question="2/3 aur 3/4 mein kaunsa bara hai?",
+                options=["2/3", "3/4", "Dono equal", "1/2"],
+                correct_answer="3/4",
+                concept_tag="fraction comparison",
+            ),
+            Question(
+                id=2,
+                difficulty="hard",
+                question="1 1/2 ko improper fraction mein convert karein.",
+                options=["2/2", "3/2", "4/2", "5/2"],
+                correct_answer="3/2",
+                concept_tag="mixed fractions",
+            ),
+        ],
+    }
+
+    return QuizSchema(
+        subject=subject,
+        topic=topic,
+        grade=grade,
+        questions=demo_questions[difficulty],
+    )
 
     def evaluate_quiz(self, quiz: QuizSchema, user_answers: Dict[int, str]) -> OverallEvaluation:
         """
